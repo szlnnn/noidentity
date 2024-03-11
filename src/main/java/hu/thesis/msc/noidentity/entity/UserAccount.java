@@ -1,101 +1,42 @@
 package hu.thesis.msc.noidentity.entity;
 
+import hu.thesis.msc.noidentity.enums.Role;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 @Entity
 @Table
-public class NoIdMUser {
+public class UserAccount {
 
     @Id
-    @SequenceGenerator(
-            name = "user_sequence",
-            sequenceName = "user_sequence",
-            allocationSize = 1)
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "user_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "first_name", nullable = false)
+    @Size(max = 100)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    @Size(max = 100)
     private String lastName;
-    private String accountId;
-    private String email;
 
-    public NoIdMUser(Long id, String firstName, String lastName, String accountId, String email) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.accountId = accountId;
-        this.email = email;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    public NoIdMUser(String firstName, String lastName, String accountId, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.accountId = accountId;
-        this.email = email;
-    }
+    @Column(nullable = false)
+    @Size(max = 100)
+    private String login;
 
-    public NoIdMUser() {}
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-
-
-    }
-
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", accountId='" + accountId + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
+    @Column(nullable = false)
+    @Size(max = 100)
+    private String password;
 }

@@ -4,10 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NoidentityApplication {
+public class NoIdentitySpringApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NoidentityApplication.class, args);
+		SpringApplication.run(NoIdentitySpringApplication.class, args);
 	}
+
+
 
 }

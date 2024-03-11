@@ -15,20 +15,16 @@ import java.util.List;
 public class UserAccountConfig {
 
     @Bean
-    CommandLineRunner commandLineRunner(UserAccountRepository repository) {
+    CommandLineRunner commandLineRunner(UserAccountRepository repository, PasswordEncoder passwordEncoder) {
         return args -> {
-           UserAccount szilcso =
-                   new UserAccount(1L,"Csortan",
-                           "Szilard",
-                           Role.USER,
-                           "csoszi@email.hu", "password123");
-            UserAccount mohi =
-                    new UserAccount(2L,"Bereczki",
-                            "Uzonka",
-                            Role.ADMIN,
-                            "mohi@email.hu", "password123");
+           UserAccount noadmin =
+                   new UserAccount(1L,"No",
+                           "Admin",
+                           Role.ADMIN,
+                           "noadmin", passwordEncoder.encode("Password123"));
+
             repository.saveAll(
-                    List.of(szilcso, mohi));
+                    List.of(noadmin));
         };
     }
 
