@@ -6,26 +6,43 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class SignUpDto {
 
-    @NotEmpty
-    private String firstName;
 
-    @NotEmpty
-    private String lastName;
+    private UserAccountDto accountDto;
 
-    @NotEmpty
-    private String login;
+    public String getFirstName() {
+        return this.accountDto.getFirstName();
+    }
+    public   String getLastName() {
+        return this.accountDto.getLastName();
+    }
+    public  String getEmail() {
+        return this.accountDto.getEmail();
+    }
+    public   String getLogin() {
+        return this.accountDto.getLogin();
+    }
+
+    public Date getStartDate() {
+        return this.accountDto.getStartDate();
+    }
+
+    public Date getEndDate() {
+        return this.accountDto.getEndDate();
+    }
+
 
     @NotEmpty
     private char[] password;
 
     @NotEmpty
-    
     private String role;
 
 }

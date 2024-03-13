@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import java.util.Arrays;
 
@@ -33,7 +34,8 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
-                HttpMethod.OPTIONS.name()));
+                HttpMethod.OPTIONS.name(),
+                HttpMethod.PUT.name()));
         configuration.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE));
@@ -59,4 +61,7 @@ public class SecurityConfig {
         ;
         return http.build();
     }
+
+
+
 }

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -39,4 +41,11 @@ public class UserAccount {
     @Column(nullable = false)
     @Size(max = 100)
     private String password;
+
+    @Column(nullable = false)
+    private String email;
+
+    private Date startDate;
+
+    private Date endDate;
 }

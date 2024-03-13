@@ -2,6 +2,7 @@ package hu.thesis.msc.noidentity.service;
 
 import hu.thesis.msc.noidentity.dto.CredentialsDto;
 import hu.thesis.msc.noidentity.dto.SignUpDto;
+import hu.thesis.msc.noidentity.dto.UserAccountDto;
 import hu.thesis.msc.noidentity.dto.UserDto;
 import hu.thesis.msc.noidentity.entity.UserAccount;
 import hu.thesis.msc.noidentity.enums.Role;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.CharBuffer;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -37,22 +39,26 @@ public class UserAccountService {
     }
 
     public UserDto register(SignUpDto userDto) {
-        Optional<UserAccount> optionalUser = userRepository.findByLogin(userDto.getLogin());
+        Optional<UserAccount> optionalUser = userRepository.findByLogin(userDto.getAccountDto().getLogin());
 
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
 
-        UserAccount user = userMapper.signUpToUser(userDto);
+        UserAccount user = userMapper.userAccountDtoToUserAccount(userDto.getAccountDto());
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
-        if ((Role.USER.getAuthority().equals(userDto.getRole().toUpperCase()))) {
+        setRole(userDto.getRole(), user);
+        UserAccount savedUser = userRepository.save(user);
+
+        return userMapper.toUserDto(savedUser);
+    }
+
+    private static void setRole(String roleFromClient, UserAccount user) {
+        if ((Role.USER.getAuthority().equals(roleFromClient.toUpperCase()))) {
             user.setRole(Role.USER);
         } else {
             user.setRole(Role.ADMIN);
         }
-        UserAccount savedUser = userRepository.save(user);
-
-        return userMapper.toUserDto(savedUser);
     }
 
     public UserDto findByLogin(String login) {
@@ -61,4 +67,25 @@ public class UserAccountService {
         return userMapper.toUserDto(user);
     }
 
+    public List<UserAccount> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
+    public UserAccount updateUserAccount(UserAccount userDataFromClient) {
+        Optional<UserAccount> optionalUser = userRepository.findByLogin(userDataFromClient.getLogin());
+        if (optionalUser.isEmpty()) {
+            throw new AppException("Cannot find user with login: " + userDataFromClient.getLogin(), HttpStatus.BAD_REQUEST);
+        }
+        UserAccount currentAccount = optionalUser.get();
+        currentAccount.setEmail(userDataFromClient.getEmail());
+        currentAccount.setFirstName(userDataFromClient.getFirstName());
+        currentAccount.setLastName(userDataFromClient.getLastName());
+        currentAccount.setRole(userDataFromClient.getRole());
+        currentAccount.setStartDate(userDataFromClient.getStartDate());
+        currentAccount.setEndDate(userDataFromClient.getEndDate());
+        userRepository.save(currentAccount);
+        return currentAccount;
+
+    }
 }

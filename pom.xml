@@ -77,6 +77,11 @@
 			<artifactId>guava</artifactId>
 			<version>33.0.0-jre</version>
         </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>9.0.41</version>
+        </dependency>
     </dependencies>
 
 	<build>
