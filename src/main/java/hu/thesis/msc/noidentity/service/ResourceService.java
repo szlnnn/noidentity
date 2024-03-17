@@ -2,7 +2,6 @@ package hu.thesis.msc.noidentity.service;
 
 import hu.thesis.msc.noidentity.entity.AzureResourceConfig;
 import hu.thesis.msc.noidentity.entity.Resource;
-import hu.thesis.msc.noidentity.entity.UserAccount;
 import hu.thesis.msc.noidentity.exceptions.AppException;
 import hu.thesis.msc.noidentity.repository.ResourceRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,5 +60,10 @@ public class ResourceService {
 
         return resource;
 
+    }
+
+    public Resource getResourceById(Long id) {
+        return resourceRepository.findById(id)
+                .orElseThrow(() -> new AppException("Cannot find resource with id: " + id, HttpStatus.BAD_REQUEST));
     }
 }

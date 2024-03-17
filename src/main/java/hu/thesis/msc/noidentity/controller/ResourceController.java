@@ -2,16 +2,17 @@ package hu.thesis.msc.noidentity.controller;
 
 
 import hu.thesis.msc.noidentity.entity.Resource;
-import hu.thesis.msc.noidentity.entity.UserAccount;
 import hu.thesis.msc.noidentity.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,14 +36,18 @@ public class ResourceController {
 
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Resource> getResources() {
         return resourceService.getAllResources();
     }
 
+    @GetMapping("/{id}")
+    public Resource getResource(@PathVariable Long id) {
+        return resourceService.getResourceById(id);
+    }
+
     @PutMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Resource updateUserAccount(@RequestBody Resource resource) {
+    public Resource updateResource(@RequestBody Resource resource) {
         return resourceService.updateResource(resource);
     }
 
