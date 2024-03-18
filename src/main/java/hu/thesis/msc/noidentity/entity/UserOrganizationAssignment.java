@@ -1,12 +1,12 @@
 package hu.thesis.msc.noidentity.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table
-public class Resource {
+public class UserOrganizationAssignment {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
 
-    private String type;
+    @ManyToOne(fetch=FetchType.LAZY)
+    private UserAccount user;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToOne(fetch = FetchType.LAZY)
-    private AzureResourceConfig azureConfig;
+    @ManyToOne(fetch=FetchType.LAZY)
+    private Organization organization;
 
-
+    private String assignmentType;
 
 }

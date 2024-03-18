@@ -25,13 +25,13 @@ public class UserAccountController {
     }
 
     @GetMapping
-    public List<UserAccount> getUsers() {
+    public List<UserAccountDto> getUsers() {
        return userService.getAllUsers();
     }
 
     @PutMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
-    public UserAccount updateUserAccount(@RequestBody UserAccount userAccount) {
+    public UserAccount updateUserAccount(@RequestBody UserAccountDto userAccount) {
        return userService.updateUserAccount(userAccount);
     }
 }

@@ -1,5 +1,6 @@
 package hu.thesis.msc.noidentity.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import hu.thesis.msc.noidentity.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -9,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.ALL;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -48,4 +52,5 @@ public class UserAccount {
     private Date startDate;
 
     private Date endDate;
+
 }

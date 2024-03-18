@@ -1,31 +1,21 @@
 package hu.thesis.msc.noidentity.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import hu.thesis.msc.noidentity.entity.Organization;
+import hu.thesis.msc.noidentity.entity.UserAccount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserAccountDto {
-
-
+public class OrganizationManagerDto {
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String login;
-    private Date startDate;
-    private Date endDate;
-    private String email;
+    private String name;
+    private String company;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private Organization organization;
-    private String role;
+    private UserAccount manager;
 
 }

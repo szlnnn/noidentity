@@ -38,11 +38,10 @@ public class SignUpDto {
         return this.accountDto.getEndDate();
     }
 
+    public String getRole() {return this.accountDto.getRole();}
 
     @NotEmpty
     private char[] password;
 
-    @NotEmpty
-    private String role;
 
 }
