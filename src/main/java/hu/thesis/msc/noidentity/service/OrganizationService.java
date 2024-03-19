@@ -54,7 +54,7 @@ public class OrganizationService {
 
         Organization savedOrg = organizationRepository.save(toSaveOrg);
 
-        if (organizationFromClient.getManager().getId() != null) {
+        if (organizationFromClient.getManager() != null) {
             createUserOrganizationAssignment(new UserOrganizationAssignmentMinimalDataDto(organizationFromClient.getManager().getId(), savedOrg.getId(), "manager"));
         }
 
@@ -70,7 +70,7 @@ public class OrganizationService {
                     return organizationRepository.save(org);
                 })
                 .orElseThrow(() -> new AppException("Cannot find provided organization: " + organizationFromClient.getName(), HttpStatus.BAD_REQUEST));
-        if (organizationFromClient.getManager().getId() != null) {
+        if (organizationFromClient.getManager() != null) {
             createUserOrganizationAssignment(new UserOrganizationAssignmentMinimalDataDto(organizationFromClient.getManager().getId(), savedOrg.getId(), "manager"));
         }
 

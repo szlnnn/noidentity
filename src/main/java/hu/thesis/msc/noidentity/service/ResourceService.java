@@ -46,16 +46,16 @@ public class ResourceService {
 
         Resource resource = optionalResource.get();
 
-        if (resource.getAzureConfig() == null) {
-            return resource;
+        if (resource.getAzureConfig() != null) {
+            AzureResourceConfig azureConfig = resource.getAzureConfig();
+            azureConfig.setApplicationId(resourceFromClient.getAzureConfig().getApplicationId());
+            azureConfig.setTenantId(resourceFromClient.getAzureConfig().getTenantId());
+            azureConfig.setScope(resourceFromClient.getAzureConfig().getScope());
+            azureConfig.setSecret(resourceFromClient.getAzureConfig().getSecret());
+            resource.setAzureConfig(azureConfig);
         }
-        AzureResourceConfig azureConfig = resource.getAzureConfig();
-        azureConfig.setApplicationId(resourceFromClient.getAzureConfig().getApplicationId());
-        azureConfig.setTenantId(resourceFromClient.getAzureConfig().getTenantId());
-        azureConfig.setScope(resourceFromClient.getAzureConfig().getScope());
-        azureConfig.setSecret(resourceFromClient.getAzureConfig().getSecret());
 
-        resource.setAzureConfig(azureConfig);
+        resource.setAppOwner(resourceFromClient.getAppOwner());
         resourceRepository.save(resource);
 
         return resource;
