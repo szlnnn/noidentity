@@ -30,6 +30,11 @@ public class RoleController {
        return roleService.getRolesUnderResource(id);
     }
 
+    @GetMapping
+    public List<Role> getAllRoles() {
+        return roleService.getAllRoles();
+    }
+
     @PostMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
     public Role createRole(@RequestBody Role role) {

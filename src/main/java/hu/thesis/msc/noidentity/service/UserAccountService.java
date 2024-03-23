@@ -6,6 +6,7 @@ import hu.thesis.msc.noidentity.dto.UserAccountDto;
 import hu.thesis.msc.noidentity.dto.UserDto;
 import hu.thesis.msc.noidentity.dto.UserOrganizationAssignmentMinimalDataDto;
 import hu.thesis.msc.noidentity.entity.UserAccount;
+import hu.thesis.msc.noidentity.entity.UserOrganizationAssignment;
 import hu.thesis.msc.noidentity.enums.Role;
 import hu.thesis.msc.noidentity.exceptions.AppException;
 import hu.thesis.msc.noidentity.mappers.UserAccountMapper;
@@ -35,6 +36,7 @@ public class UserAccountService {
 
     private final UserOrganizationAssignmentRepository assignmentRepository;
 
+    private final UserOrganizationAssignmentRepository userOrganizationAssignmentRepository;
 
     public UserDto login(CredentialsDto credentialsDto) {
         UserAccount user = userRepository.findByLogin(credentialsDto.getLogin())
@@ -93,11 +95,7 @@ public class UserAccountService {
 
 
     public UserAccount updateUserAccount(UserAccountDto userDataFromClient) {
-        Optional<UserAccount> optionalUser = userRepository.findByLogin(userDataFromClient.getLogin());
-        if (optionalUser.isEmpty()) {
-            throw new AppException("Cannot find user with login: " + userDataFromClient.getLogin(), HttpStatus.BAD_REQUEST);
-        }
-        UserAccount currentAccount = optionalUser.get();
+        UserAccount currentAccount = getUserOrElseThrow(userDataFromClient.getLogin());
         currentAccount.setEmail(userDataFromClient.getEmail());
         currentAccount.setFirstName(userDataFromClient.getFirstName());
         currentAccount.setLastName(userDataFromClient.getLastName());
@@ -112,5 +110,22 @@ public class UserAccountService {
         }
         return currentAccount;
 
+    }
+
+    public UserAccount getUserOrElseThrow(String login) {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Cannot find user with login: " + login, HttpStatus.BAD_REQUEST));
+        }
+
+    public UserAccount getAdminUser() {
+        return userRepository.findByLogin("noadmin").orElse(null);
+    }
+
+    public UserAccount getManagerForUser(UserAccount user) {
+        return userOrganizationAssignmentRepository.findByUserAndAssignmentType(user, "member")
+                .map(UserOrganizationAssignment::getOrganization)
+                .flatMap(organization -> userOrganizationAssignmentRepository.findByOrganizationAndAssignmentType(organization, "manager"))
+                .map(UserOrganizationAssignment::getUser)
+                .orElse(getAdminUser());
     }
 }

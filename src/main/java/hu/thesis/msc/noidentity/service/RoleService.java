@@ -25,6 +25,10 @@ public class RoleService {
                 .orElseThrow(() -> new AppException("Cannot find provided resource: " + resourceId, HttpStatus.BAD_REQUEST));
     }
 
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
+
     public Role createRole(Role roleFromClient) {
         Optional<Resource> resourceOptional = resourceRepository.findById(roleFromClient.getResource().getId());
 
