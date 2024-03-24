@@ -36,6 +36,9 @@ public class RequestService {
 
     private final RequestTaskRepository requestTaskRepository;
 
+    private final ResourceAccountOperationRequestService operationRequestService;
+
+
 
     public void createRequestsFromBulkRequest(ClientRequestDto clientRequestDto) {
         ArrayList<Role> rolesToRequest = clientRequestDto.getRolesToRequest();
@@ -176,7 +179,17 @@ public class RequestService {
     }
 
     private void approveAppOwnerTask(RequestTask task) {
-        //todo
+        Request originalRequest = task.getParentRequest();
+        originalRequest.setStatus("P");
+        UserRoleAssignment ura = originalRequest.getAssignment();
+        if ("A".equals(originalRequest.getOperation())) {
+            ura.setAssignmentStatus("PA");
+        } else {
+            ura.setAssignmentStatus("PR");
+        }
+        assignmentRepository.save(ura);
+        requestRepository.save(originalRequest);
+        operationRequestService.createOperationRequest(originalRequest);
     }
 
     public void approveManagerTask(RequestTask task) {

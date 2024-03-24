@@ -103,4 +103,8 @@ public class OrganizationService {
         return assignmentRepository.save(newAssignment);
     }
 
+    public Organization getOrganizationOfUser(UserAccount userAccount) {
+        return assignmentRepository.findByUserAndAssignmentType(userAccount, "member").map(UserOrganizationAssignment::getOrganization).orElse(null);
+    }
+
 }

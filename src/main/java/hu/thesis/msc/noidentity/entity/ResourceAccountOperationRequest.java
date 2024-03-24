@@ -1,6 +1,6 @@
 package hu.thesis.msc.noidentity.entity;
 
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,35 +21,30 @@ import java.util.Date;
 @Data
 @Entity
 @Table
-public class UserRoleAssignment {
-
+public class ResourceAccountOperationRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Resource resource;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private UserAccount user;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    private Role role;
-
-
     /**
-     * PA -- waiting for provision but approved
-     * PR -- waiting for provision but rejected
-     * P -- pending approval
-     * R -- revoked or refused
-     * A -- assigned
+     * N - new
+     * R - Running
+     * F - Failed
+     * S - success
      */
-    private String assignmentStatus;
+    private String status;
 
+    private String lastError;
 
-    private Date creationTime;
+    private Date createTime;
 
-    private Date assignedTime;
-
-    private Date revokedTime;
-
+    private Date completionTime;
 
 }
