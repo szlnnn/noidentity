@@ -52,6 +52,7 @@ public class ResourceAccountOperationRequestService {
         }
         operationRequest.setStatus("S");
         operationRequest.setCompletionTime(new Date());
+        operationRequest.setLastError(null);
         operationRequestRepository.save(operationRequest);
     }
 

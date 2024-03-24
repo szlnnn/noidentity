@@ -4,6 +4,7 @@ import hu.thesis.msc.noidentity.dto.ClientRequestDto;
 import hu.thesis.msc.noidentity.dto.RequestTaskDto;
 import hu.thesis.msc.noidentity.entity.Request;
 import hu.thesis.msc.noidentity.entity.RequestTask;
+import hu.thesis.msc.noidentity.entity.ResourceAccount;
 import hu.thesis.msc.noidentity.entity.Role;
 import hu.thesis.msc.noidentity.entity.UserAccount;
 import hu.thesis.msc.noidentity.entity.UserRoleAssignment;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -151,8 +153,12 @@ public class RequestService {
         requestRepository.save(originalRequest);
 
         UserRoleAssignment ura = originalRequest.getAssignment();
-        ura.setAssignmentStatus("R");
-        ura.setRevokedTime(new Date());
+        if ("A".equals(originalRequest.getOperation())) {
+            ura.setAssignmentStatus("R");
+            ura.setRevokedTime(new Date());
+        } else {
+            ura.setAssignmentStatus("A");
+        }
         assignmentRepository.save(ura);
 
     }
@@ -206,6 +212,51 @@ public class RequestService {
     public UserAccount getApproverForAppOwnerTask(Request request) {
         return Optional.of(request.getRole().getResource().getAppOwner())
                .orElse(userAccountService.getAdminUser());
+    }
+
+
+    public void afterProvisionListener(ResourceAccount resourceAccount) {
+        List<UserRoleAssignment> assignments = assignmentRepository.findByUserAndAssignmentStatusIn(resourceAccount.getUser(), getPendingProvisionStatuses());
+        assignments
+                .stream()
+                .filter(ura -> ura.getRole().getResource().getId().equals(resourceAccount.getResource().getId()))
+                .forEach(ura -> handleFulfillment(ura, resourceAccount));
+    }
+
+    private List<String> getPendingProvisionStatuses() {
+        return List.of("PA", "PR");
+    }
+
+    private void handleFulfillment(UserRoleAssignment ura, ResourceAccount resourceAccount) {
+        Request pendingRequest = requestRepository.findAllByStatusAndAssignment("P", ura).stream().findFirst().orElse(null);
+        Map<String, Object> attributesOnResource = resourceAccount.getAttributesOnResource();
+        List<String> rolesFromResource = (List<String>) attributesOnResource.get("roles");
+        List<String> licencesFromResource = (List<String>) attributesOnResource.get("licences");
+        if ("PA".equals(ura.getAssignmentStatus())) {
+            if ("ApplicationRole".equals(ura.getRole().getType()) && rolesFromResource.contains(ura.getRole().getResourceRoleId())) {
+                ura.setAssignmentStatus("A");
+                ura.setAssignedTime(new Date());
+            }
+            if ("Licence".equals(ura.getRole().getType()) && licencesFromResource.contains(ura.getRole().getResourceRoleId())) {
+                ura.setAssignmentStatus("A");
+                ura.setAssignedTime(new Date());
+            }
+        } else {
+            if ("ApplicationRole".equals(ura.getRole().getType()) && !rolesFromResource.contains(ura.getRole().getResourceRoleId())) {
+                ura.setAssignmentStatus("R");
+                ura.setRevokedTime(new Date());
+            }
+            if ("Licence".equals(ura.getRole().getType()) && !licencesFromResource.contains(ura.getRole().getResourceRoleId())) {
+                ura.setAssignmentStatus("R");
+                ura.setRevokedTime(new Date());
+            }
+        }
+        if (pendingRequest != null) {
+            pendingRequest.setStatus("C");
+            pendingRequest.setOutcome("C");
+            requestRepository.save(pendingRequest);
+        }
+        assignmentRepository.save(ura);
     }
 
 }

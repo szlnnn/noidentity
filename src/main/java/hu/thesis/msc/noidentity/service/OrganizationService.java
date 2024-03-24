@@ -28,16 +28,16 @@ public class OrganizationService {
     private final UserOrganizationAssignmentRepository assignmentRepository;
 
     public List<OrganizationManagerDto> getAllOrganizations() {
-         return organizationRepository.findAll().stream()
-                 .map(org -> {
-                     OrganizationManagerDto dto = new OrganizationManagerDto();
-                     dto.setId(org.getId());
-                     assignmentRepository.findByOrganizationAndAssignmentType(org, "manager")
-                             .ifPresent(assignment -> dto.setManager(assignment.getUser()));
-                     dto.setName(org.getName());
-                     dto.setCompany(org.getCompany());
-                     return dto;
-                 }).collect(Collectors.toList());
+        return organizationRepository.findAll().stream()
+                .map(org -> {
+                    OrganizationManagerDto dto = new OrganizationManagerDto();
+                    dto.setId(org.getId());
+                    assignmentRepository.findByOrganizationAndAssignmentType(org, "manager")
+                            .ifPresent(assignment -> dto.setManager(assignment.getUser()));
+                    dto.setName(org.getName());
+                    dto.setCompany(org.getCompany());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 
     public Organization createOrganization(OrganizationManagerDto organizationFromClient) {
@@ -83,12 +83,12 @@ public class OrganizationService {
         Optional<Organization> organization = organizationRepository.findById(dto.getOrganizationId());
 
         if (user.isEmpty() || organization.isEmpty()) {
-            throw new AppException("Cannot find user or organization userId: " + dto.getUserId() + " orgid: "  + dto.getOrganizationId(), HttpStatus.BAD_REQUEST);
+            throw new AppException("Cannot find user or organization userId: " + dto.getUserId() + " orgid: " + dto.getOrganizationId(), HttpStatus.BAD_REQUEST);
         }
 
         if ("manager".equals(dto.getAssignmentType())) {
-        assignmentRepository.findByOrganizationAndAssignmentType(organization.get(), dto.getAssignmentType())
-                .ifPresent(assignmentRepository::delete);
+            assignmentRepository.findByOrganizationAndAssignmentType(organization.get(), dto.getAssignmentType())
+                    .ifPresent(assignmentRepository::delete);
         } else if ("member".equals(dto.getAssignmentType())) {
             assignmentRepository.findByUserAndAssignmentType(user.get(), dto.getAssignmentType())
                     .ifPresent(assignmentRepository::delete);

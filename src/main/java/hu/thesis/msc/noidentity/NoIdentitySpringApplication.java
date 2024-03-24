@@ -13,7 +13,5 @@ public class NoIdentitySpringApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NoIdentitySpringApplication.class, args);
 	}
-
-
-
 }
+

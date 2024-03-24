@@ -29,7 +29,7 @@ public class ResourceAccountService {
     private final ResourceAccountRepository resourceAccountRepository;
 
     public void updateResourceAccount(ResourceAccount resourceAccount) {
-        if (resourceAccount.getAttributesOnResource() != null) {
+        if (resourceAccount.getIdentifier() != null) {
             resourceAccount.setOperation("U");
         }
         resourceAccount.setLastUpdateTime(new Date());

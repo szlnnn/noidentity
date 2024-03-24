@@ -55,6 +55,7 @@ public class ResourceAccount {
 
     private String operation;
 
+    @Column(length = 4000)
     private String provisionError;
 
     private Date lastUpdateTime;
