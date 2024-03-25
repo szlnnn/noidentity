@@ -1,5 +1,6 @@
 package hu.thesis.msc.noidentity.controller;
 
+import hu.thesis.msc.noidentity.dto.UserRoleAssignmentMinimalDataDto;
 import hu.thesis.msc.noidentity.entity.Role;
 import hu.thesis.msc.noidentity.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,10 @@ public class RoleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public Role updateRole(@RequestBody Role role) {
             return roleService.updateRole(role);
+    }
+
+    @GetMapping("/user/{id}")
+    public List<UserRoleAssignmentMinimalDataDto> getRolesOfUser(@PathVariable Long id) {
+        return roleService.getAssignedRolesDtosForUser(id);
     }
 }

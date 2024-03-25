@@ -117,6 +117,11 @@ public class UserAccountService {
                 .orElseThrow(() -> new AppException("Cannot find user with login: " + login, HttpStatus.BAD_REQUEST));
         }
 
+    public UserAccount getUserByIdOrElseThrow(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new AppException("Cannot find user with id: " + id, HttpStatus.BAD_REQUEST));
+    }
+
     public UserAccount getAdminUser() {
         return userRepository.findByLogin("noadmin").orElse(null);
     }

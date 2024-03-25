@@ -236,10 +236,12 @@ public class RequestService {
             if ("ApplicationRole".equals(ura.getRole().getType()) && rolesFromResource.contains(ura.getRole().getResourceRoleId())) {
                 ura.setAssignmentStatus("A");
                 ura.setAssignedTime(new Date());
+                ura.setRevokedTime(null);
             }
             if ("Licence".equals(ura.getRole().getType()) && licencesFromResource.contains(ura.getRole().getResourceRoleId())) {
                 ura.setAssignmentStatus("A");
                 ura.setAssignedTime(new Date());
+                ura.setRevokedTime(null);
             }
         } else {
             if ("ApplicationRole".equals(ura.getRole().getType()) && !rolesFromResource.contains(ura.getRole().getResourceRoleId())) {

@@ -1,16 +1,21 @@
 package hu.thesis.msc.noidentity.service;
 
+import hu.thesis.msc.noidentity.dto.UserRoleAssignmentMinimalDataDto;
 import hu.thesis.msc.noidentity.entity.Resource;
 import hu.thesis.msc.noidentity.entity.Role;
+import hu.thesis.msc.noidentity.entity.UserAccount;
+import hu.thesis.msc.noidentity.entity.UserRoleAssignment;
 import hu.thesis.msc.noidentity.exceptions.AppException;
 import hu.thesis.msc.noidentity.repository.ResourceRepository;
 import hu.thesis.msc.noidentity.repository.RoleRepository;
+import hu.thesis.msc.noidentity.repository.UserRoleAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +24,10 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     private final ResourceRepository resourceRepository;
+
+    private final UserAccountService userAccountService;
+
+    private final UserRoleAssignmentRepository userRoleAssignmentRepository;
 
     public List<Role> getRolesUnderResource(Long resourceId) {
         return resourceRepository.findById(resourceId).map(roleRepository::findAllByResource)
@@ -49,6 +58,21 @@ public class RoleService {
                     return roleRepository.save(role);
                 })
                 .orElseThrow(() -> new AppException("Cannot find provided role: " + roleFromClient.getName(), HttpStatus.BAD_REQUEST));
+    }
+
+    public List<UserRoleAssignmentMinimalDataDto> getAssignedRolesDtosForUser(Long id) {
+        UserAccount user = userAccountService.getUserByIdOrElseThrow(id);
+        return userRoleAssignmentRepository.findByUser(user).stream().map(ura -> {
+            UserRoleAssignmentMinimalDataDto dto = new UserRoleAssignmentMinimalDataDto();
+            dto.setId(ura.getId());
+            dto.setUserId(user.getId());
+            dto.setRole(ura.getRole());
+            dto.setAssignmentStatus(ura.getAssignmentStatus());
+            dto.setCreatedTime(ura.getCreationTime());
+            dto.setAssignedTime(ura.getAssignedTime());
+            dto.setRevokedTime(ura.getRevokedTime());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 }

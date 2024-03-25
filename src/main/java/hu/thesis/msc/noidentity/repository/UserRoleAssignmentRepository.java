@@ -15,4 +15,6 @@ public interface UserRoleAssignmentRepository extends JpaRepository<UserRoleAssi
 
     List<UserRoleAssignment> findByUserAndAssignmentStatusIn(UserAccount user, List<String> statuses);
 
+    List<UserRoleAssignment> findByUser(UserAccount user);
+
 }
