@@ -41,7 +41,6 @@ public class RequestService {
     private final ResourceAccountOperationRequestService operationRequestService;
 
 
-
     public void createRequestsFromBulkRequest(ClientRequestDto clientRequestDto) {
         ArrayList<Role> rolesToRequest = clientRequestDto.getRolesToRequest();
         ArrayList<Role> rolesToRevoke = clientRequestDto.getRolesToRevoke();
@@ -56,7 +55,8 @@ public class RequestService {
     private void createRequestAndUserRoleAssignments(Role role, UserAccount requester, UserAccount targetUser, String operation) {
         Optional<UserRoleAssignment> existingAssignment = assignmentRepository.findByRoleAndUser(role, targetUser);
 
-        if (existingAssignment.isPresent() && "P".equals(existingAssignment.get().getAssignmentStatus())) {
+        if (existingAssignment.isPresent() && ("PA".equals(existingAssignment.get().getAssignmentStatus())
+                || "PR".equals(existingAssignment.get().getAssignmentStatus()))) {
             return; // ha mar van igenyles akkor valami nem okes
         }
 
@@ -68,8 +68,8 @@ public class RequestService {
         newRequest.setOperation(operation);
         newRequest.setTargetUser(targetUser);
 
-        existingAssignment.ifPresent(userRoleAssignment -> {
-            userRoleAssignment.setAssignmentStatus("P");
+        existingAssignment.ifPresent((UserRoleAssignment userRoleAssignment) -> {
+            userRoleAssignment.setAssignmentStatus(calculateURAStatusFromRequestOperation(operation));
             newRequest.setAssignment(userRoleAssignment);
         });
         if (existingAssignment.isEmpty()) {
@@ -77,12 +77,16 @@ public class RequestService {
             newUserRoleAssignment.setRole(role);
             newUserRoleAssignment.setUser(targetUser);
             newUserRoleAssignment.setCreationTime(new Date());
-            newUserRoleAssignment.setAssignmentStatus("P");
+            newUserRoleAssignment.setAssignmentStatus(calculateURAStatusFromRequestOperation(operation));
             assignmentRepository.save(newUserRoleAssignment);
             newRequest.setAssignment(newUserRoleAssignment);
         }
         requestRepository.save(newRequest);
 
+    }
+
+    private String calculateURAStatusFromRequestOperation(String operation) {
+        return "A".equals(operation) ? "PA" : "PR";
     }
 
 
@@ -108,13 +112,13 @@ public class RequestService {
 
 
     public List<RequestTaskDto> getTasksForApprover(Long approverId) {
-        Optional<UserAccount> approver =  userAccountRepository.findById(approverId);
+        Optional<UserAccount> approver = userAccountRepository.findById(approverId);
         if (approver.isEmpty()) {
             return Collections.emptyList();
         }
         List<RequestTaskDto> responseDtos = new ArrayList<>();
         requestTaskRepository.findAllByStatusAndAndApprover("N", approver.get())
-                .forEach(requestTask -> {
+                .forEach((RequestTask requestTask) -> {
                     RequestTaskDto dto = convertTaskToDto(requestTask);
                     responseDtos.add(dto);
                 });
@@ -175,7 +179,7 @@ public class RequestService {
         } else if ("applicationOwner".equals(task.getType())) {
             approveAppOwnerTask(task);
         } else {
-            throw  new AppException("Cannot handle task with type : " + task.getType(), HttpStatus.BAD_REQUEST);
+            throw new AppException("Cannot handle task with type : " + task.getType(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -211,7 +215,7 @@ public class RequestService {
 
     public UserAccount getApproverForAppOwnerTask(Request request) {
         return Optional.of(request.getRole().getResource().getAppOwner())
-               .orElse(userAccountService.getAdminUser());
+                .orElse(userAccountService.getAdminUser());
     }
 
 
