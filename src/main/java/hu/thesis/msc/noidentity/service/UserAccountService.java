@@ -43,7 +43,13 @@ public class UserAccountService {
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
-            return userMapper.toUserDto(user);
+            UserDto dto = userMapper.toUserDto(user);
+            dto.setOrganization(organizationService.getOrganizationOfUser(user));
+            dto.setManager(getManagerForUser(user));
+            dto.setStartDate(user.getStartDate());
+            dto.setEndDate(user.getEndDate());
+            dto.setEmail(user.getEmail());
+            return dto;
         }
         throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
     }
@@ -86,10 +92,10 @@ public class UserAccountService {
         return userRepository.findAll().stream()
                 .map(userAccount -> {
                     UserAccountDto dto = userMapper.toUserAccountDto(userAccount);
-                assignmentRepository.findByUserAndAssignmentType(userAccount, "member")
-                        .ifPresent(assignemnt -> dto.setOrganization(assignemnt.getOrganization()));
-                dto.setRole(userAccount.getRole().getAuthority());
-                return dto;
+                    assignmentRepository.findByUserAndAssignmentType(userAccount, "member")
+                            .ifPresent(assignemnt -> dto.setOrganization(assignemnt.getOrganization()));
+                    dto.setRole(userAccount.getRole().getAuthority());
+                    return dto;
                 }).collect(Collectors.toList());
     }
 
@@ -115,7 +121,7 @@ public class UserAccountService {
     public UserAccount getUserOrElseThrow(String login) {
         return userRepository.findByLogin(login)
                 .orElseThrow(() -> new AppException("Cannot find user with login: " + login, HttpStatus.BAD_REQUEST));
-        }
+    }
 
     public UserAccount getUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id)
