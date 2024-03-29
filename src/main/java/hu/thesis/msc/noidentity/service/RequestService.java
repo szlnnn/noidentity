@@ -2,6 +2,7 @@ package hu.thesis.msc.noidentity.service;
 
 import hu.thesis.msc.noidentity.dto.ClientRequestDto;
 import hu.thesis.msc.noidentity.dto.RequestTaskDto;
+import hu.thesis.msc.noidentity.dto.RequestWithTasksDto;
 import hu.thesis.msc.noidentity.entity.Request;
 import hu.thesis.msc.noidentity.entity.RequestTask;
 import hu.thesis.msc.noidentity.entity.ResourceAccount;
@@ -22,7 +23,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -117,7 +120,7 @@ public class RequestService {
             return Collections.emptyList();
         }
         List<RequestTaskDto> responseDtos = new ArrayList<>();
-        requestTaskRepository.findAllByStatusAndAndApprover("N", approver.get())
+        requestTaskRepository.findAllByStatusAndApprover("N", approver.get())
                 .forEach((RequestTask requestTask) -> {
                     RequestTaskDto dto = convertTaskToDto(requestTask);
                     responseDtos.add(dto);
@@ -263,6 +266,31 @@ public class RequestService {
             requestRepository.save(pendingRequest);
         }
         assignmentRepository.save(ura);
+    }
+
+    public List<RequestWithTasksDto> getRequestsOfUserWithTasks(Long userId) {
+        return requestRepository.findAllByRequester(userAccountService.getUserByIdOrElseThrow(userId))
+                .stream()
+                .map(this::buildRequestWithTaskDto)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private RequestWithTasksDto buildRequestWithTaskDto(Request request) {
+        List<RequestTask> tasksOfRequest = requestTaskRepository.findAllByParentRequest(request);
+        if (tasksOfRequest.size() > 2) {
+            return null;
+        }
+        RequestWithTasksDto dto = new RequestWithTasksDto();
+        dto.setRequest(request);
+        tasksOfRequest.forEach((RequestTask task) -> {
+            if ("manager".equals(task.getType())) {
+                dto.setManagerTask(task);
+            } else {
+                dto.setApplicationOwnerTask(task);
+            }
+        });
+        return dto;
     }
 
 }

@@ -1,6 +1,7 @@
 package hu.thesis.msc.noidentity.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,10 +29,11 @@ public class RequestTask {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch=FetchType.LAZY)
     private UserAccount approver;
 
-
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch=FetchType.LAZY)
     private Request parentRequest;
 

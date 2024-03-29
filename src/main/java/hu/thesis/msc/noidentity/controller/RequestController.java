@@ -2,6 +2,7 @@ package hu.thesis.msc.noidentity.controller;
 
 import hu.thesis.msc.noidentity.dto.ClientRequestDto;
 import hu.thesis.msc.noidentity.dto.RequestTaskDto;
+import hu.thesis.msc.noidentity.dto.RequestWithTasksDto;
 import hu.thesis.msc.noidentity.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,9 @@ public class RequestController {
         return ResponseEntity.ok("Task rejected");
     }
 
-
-
-
+    @GetMapping("/requester/{id}")
+    public ResponseEntity<List<RequestWithTasksDto>> getRequestsOfRequester(@PathVariable Long id) {
+        return ResponseEntity.ok(requestService.getRequestsOfUserWithTasks(id));
+    }
 
 }
