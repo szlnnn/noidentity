@@ -62,17 +62,24 @@ public class RoleService {
 
     public List<UserRoleAssignmentMinimalDataDto> getAssignedRolesDtosForUser(Long id) {
         UserAccount user = userAccountService.getUserByIdOrElseThrow(id);
-        return userRoleAssignmentRepository.findByUser(user).stream().map(ura -> {
-            UserRoleAssignmentMinimalDataDto dto = new UserRoleAssignmentMinimalDataDto();
-            dto.setId(ura.getId());
-            dto.setUserId(user.getId());
-            dto.setRole(ura.getRole());
-            dto.setAssignmentStatus(ura.getAssignmentStatus());
-            dto.setCreatedTime(ura.getCreationTime());
-            dto.setAssignedTime(ura.getAssignedTime());
-            dto.setRevokedTime(ura.getRevokedTime());
-            return dto;
-        }).collect(Collectors.toList());
+        return userRoleAssignmentRepository.findByUser(user).stream().map(this::buildUraDto).collect(Collectors.toList());
     }
+
+    public List<UserRoleAssignmentMinimalDataDto> getAllAssignments() {
+        return userRoleAssignmentRepository.findAll().stream().map(this::buildUraDto).collect(Collectors.toList());
+    }
+
+    private UserRoleAssignmentMinimalDataDto buildUraDto(UserRoleAssignment ura) {
+        UserRoleAssignmentMinimalDataDto dto = new UserRoleAssignmentMinimalDataDto();
+        dto.setId(ura.getId());
+        dto.setUserId(ura.getUser().getId());
+        dto.setRole(ura.getRole());
+        dto.setAssignmentStatus(ura.getAssignmentStatus());
+        dto.setCreatedTime(ura.getCreationTime());
+        dto.setAssignedTime(ura.getAssignedTime());
+        dto.setRevokedTime(ura.getRevokedTime());
+        return dto;
+    }
+
 
 }

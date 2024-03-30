@@ -37,7 +37,7 @@ public class OrganizationController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
     public Organization createOrganization(@RequestBody OrganizationManagerDto organizationManagerDto) {
-       return organizationService.createOrganization(organizationManagerDto);
+        return organizationService.createOrganization(organizationManagerDto);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

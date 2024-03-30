@@ -52,4 +52,10 @@ public class RoleController {
     public List<UserRoleAssignmentMinimalDataDto> getRolesOfUser(@PathVariable Long id) {
         return roleService.getAssignedRolesDtosForUser(id);
     }
+
+    @GetMapping("/user")
+    public List<UserRoleAssignmentMinimalDataDto> getAllAssignments() {
+        return roleService.getAllAssignments();
+    }
+
 }
