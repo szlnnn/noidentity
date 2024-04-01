@@ -1,7 +1,9 @@
 package hu.thesis.msc.noidentity.controller;
 
 
+import com.azure.core.annotation.Get;
 import hu.thesis.msc.noidentity.entity.Resource;
+import hu.thesis.msc.noidentity.entity.ResourceAttributeValue;
 import hu.thesis.msc.noidentity.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +51,19 @@ public class ResourceController {
     public Resource updateResource(@RequestBody Resource resource) {
         return resourceService.updateResource(resource);
     }
+
+    @GetMapping("/values")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<ResourceAttributeValue> getResourceAttributeValues() {
+        return resourceService.getAttributeValuesForOnlineResources();
+    }
+
+    @PutMapping("/value")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ResourceAttributeValue> getResourceAttributeValues(@RequestBody ResourceAttributeValue attributeValue) {
+        return ResponseEntity.ok(resourceService.updateManagedValue(attributeValue));
+    }
+
+
 
 }

@@ -8,15 +8,19 @@ import com.microsoft.graph.directoryobjects.getbyids.GetByIdsPostResponse;
 import com.microsoft.graph.directoryobjects.item.getmemberobjects.GetMemberObjectsPostRequestBody;
 import com.microsoft.graph.directoryobjects.item.getmemberobjects.GetMemberObjectsPostResponse;
 import com.microsoft.graph.models.AssignedLicense;
+import com.microsoft.graph.models.DirectoryRoleCollectionResponse;
 import com.microsoft.graph.models.Entity;
 import com.microsoft.graph.models.LicenseDetailsCollectionResponse;
 import com.microsoft.graph.models.PasswordProfile;
 import com.microsoft.graph.models.ReferenceCreate;
+import com.microsoft.graph.models.SubscribedSkuCollectionResponse;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.graph.users.item.assignlicense.AssignLicensePostRequestBody;
+import hu.thesis.msc.noidentity.dto.AzureRoleObjectDto;
 import hu.thesis.msc.noidentity.dto.ResponseFromResourceDto;
 import hu.thesis.msc.noidentity.entity.AzureResourceConfig;
+import hu.thesis.msc.noidentity.entity.Resource;
 import hu.thesis.msc.noidentity.entity.ResourceAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,40 @@ public class AzureResourceService {
                 .clientSecret(azureResourceConfig.getSecret())
                 .build();
         return new GraphServiceClient(credential, azureResourceConfig.getScope());
+    }
+
+    public List<AzureRoleObjectDto> getDirectoryRoles(Resource resource) {
+        GraphServiceClient graphClient = getGraphServiceClient(resource.getAzureConfig());
+
+        DirectoryRoleCollectionResponse result = graphClient.directoryRoles().get();
+
+        if (result == null || result.getValue() == null) {
+            return Collections.emptyList();
+        }
+        return  result.getValue().stream()
+                .map(role ->  {
+                    AzureRoleObjectDto directoryRole = new AzureRoleObjectDto();
+                    directoryRole.setUid(String.valueOf(role.getId()));
+                    directoryRole.setName(role.getDisplayName());
+                    return directoryRole;
+                }).collect(Collectors.toList());
+    }
+
+    public List<AzureRoleObjectDto> getLicences(Resource resource) {
+        GraphServiceClient graphClient = getGraphServiceClient(resource.getAzureConfig());
+
+        SubscribedSkuCollectionResponse result = graphClient.subscribedSkus().get();
+
+        if (result == null || result.getValue() == null) {
+            return Collections.emptyList();
+        }
+        return  result.getValue().stream()
+                .map(subscribedSku ->  {
+                    AzureRoleObjectDto licence = new AzureRoleObjectDto();
+                    licence.setUid(String.valueOf(subscribedSku.getSkuId()));
+                    licence.setName(subscribedSku.getSkuPartNumber());
+                    return licence;
+                }).collect(Collectors.toList());
     }
 
     public ResponseFromResourceDto create(ResourceAccount resourceAccount) {

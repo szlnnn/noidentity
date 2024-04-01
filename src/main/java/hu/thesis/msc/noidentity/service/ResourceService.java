@@ -1,13 +1,17 @@
 package hu.thesis.msc.noidentity.service;
 
+import hu.thesis.msc.noidentity.dto.AzureRoleObjectDto;
 import hu.thesis.msc.noidentity.entity.AzureResourceConfig;
 import hu.thesis.msc.noidentity.entity.Resource;
+import hu.thesis.msc.noidentity.entity.ResourceAttributeValue;
 import hu.thesis.msc.noidentity.exceptions.AppException;
+import hu.thesis.msc.noidentity.repository.ResourceAttributeValueRepository;
 import hu.thesis.msc.noidentity.repository.ResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +23,10 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
 
+    private final ResourceAttributeValueRepository attributeValueRepository;
+
+    private final AzureResourceService azure;
+    
     public Resource createResource(Resource resourceFromClient) {
         Optional<Resource> resourceOptional = resourceRepository.findByName(resourceFromClient.getName());
 
@@ -66,4 +74,44 @@ public class ResourceService {
         return resourceRepository.findById(id)
                 .orElseThrow(() -> new AppException("Cannot find resource with id: " + id, HttpStatus.BAD_REQUEST));
     }
+
+
+
+    public ResourceAttributeValue updateManagedValue(ResourceAttributeValue attributeValue) {
+        return attributeValueRepository.save(attributeValue);
+    }
+
+    public List<ResourceAttributeValue> getAttributeValuesForOnlineResources() {
+        List<ResourceAttributeValue> result = new ArrayList<>();
+        resourceRepository.findAllByType("Azure").stream()
+                .map(this::fetchAttributeValuesForResource)
+                .forEach(result::addAll);
+        return result;
+    }
+
+
+    public List<ResourceAttributeValue> fetchAttributeValuesForResource(Resource resource) {
+        List<AzureRoleObjectDto> licenceDtos = azure.getLicences(resource);
+        List<AzureRoleObjectDto> directoryRoleDtos = azure.getDirectoryRoles(resource);
+        
+        licenceDtos.forEach(dto -> handleDto(resource, dto, "Licence"));
+        directoryRoleDtos.forEach(dto -> handleDto(resource, dto, "ApplicationRole"));
+
+        return attributeValueRepository.findAllByResource(resource);
+
+    }
+
+    private void handleDto(Resource resource, AzureRoleObjectDto dto, String type) {
+        if (!attributeValueRepository.existsByIdentifierAndResource(dto.getUid(), resource)) {
+            ResourceAttributeValue attributeValue = new ResourceAttributeValue();
+            attributeValue.setResource(resource);
+            attributeValue.setIdentifier(dto.getUid());
+            attributeValue.setName(dto.getName());
+            attributeValue.setManaged(false);
+            attributeValue.setType(type);
+            attributeValueRepository.save(attributeValue);
+        }
+    }
+
+
 }
