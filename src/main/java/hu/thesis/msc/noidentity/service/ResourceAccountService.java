@@ -5,7 +5,6 @@ import hu.thesis.msc.noidentity.entity.Resource;
 import hu.thesis.msc.noidentity.entity.ResourceAccount;
 import hu.thesis.msc.noidentity.entity.ResourceAccountOperationRequest;
 import hu.thesis.msc.noidentity.entity.UserAccount;
-import hu.thesis.msc.noidentity.entity.UserRoleAssignment;
 import hu.thesis.msc.noidentity.repository.ResourceAccountRepository;
 import hu.thesis.msc.noidentity.repository.UserRoleAssignmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -92,7 +90,7 @@ public class ResourceAccountService {
 
 
     private List<String> getUserRoleStatuses() {
-        return List.of("A", "PA");
+        return List.of("A", "PA", "PTR");
     }
 
     private String getFullNameForUser(UserAccount userAccount) {

@@ -39,8 +39,10 @@ public class UserRoleAssignment {
 
 
     /**
-     * PA -- pending approval/waiting for provision but approved
-     * PR -- pending approval/waiting for provision but rejected
+     * PTA -- pending task request
+     * PTR -- pending task revoke
+     * PA -- waiting for provision but approved
+     * PR -- waiting for provision but rejected
      * R -- revoked or refused
      * A -- assigned
      */

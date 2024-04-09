@@ -89,7 +89,7 @@ public class RequestService {
     }
 
     private String calculateURAStatusFromRequestOperation(String operation) {
-        return "A".equals(operation) ? "PA" : "PR";
+        return "A".equals(operation) ? "PTA" : "PTR";
     }
 
 
